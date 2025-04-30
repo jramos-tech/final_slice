@@ -19,6 +19,10 @@ Route::get('/create', function () {
     return view('create');
 })->name('characters.create');
 
+Route::get('/battle', function () {
+    return view('battle');
+})->name('characters.battle');
+
 Route::get('/characters/{id}', function (RPGCharacters $id) {
     return view('show', [
         'character' => $id
@@ -35,13 +39,17 @@ Route::post('/characters', function (Request $request) {
         'skills.*.name' => 'required|max:255',
         'skills.*.description' => 'required',
         'skills.*.power_level' => 'required|integer',
+        'battles_won' => 'required|integer',
+        'total_battles' => 'required|integer',
     ]);
 
     $character = new RPGCharacters;
     $character->class_name = $data['class_name'];
     $character->description = $data['description'];
     $character->abilities = $data['abilities'];
-    $character->rarity = $data['rarity']; 
+    $character->rarity = $data['rarity'];
+    $character->battles_won = $data['battles_won'];
+    $character->total_battles = $data['total_battles']; 
     $character->save();
 
     foreach ($data['skills'] as $skillData) {

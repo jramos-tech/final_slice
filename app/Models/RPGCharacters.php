@@ -9,7 +9,7 @@ class RPGCharacters extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['class_name', 'description', 'abilities', 'rarity'];
+    protected $fillable = ['class_name', 'description', 'abilities', 'rarity', 'battles_won', 'total_battles'];
 
     public function skills()
     {

@@ -27,6 +27,8 @@
                 </li>
             @endforeach
         </ul>
+        <p class="text-gray-700 mb-4"><strong>Battles won:</strong> {{ $character->battles_won }}</p>
+        <p class="text-gray-700 mb-4"><strong>Total battles:</strong> {{ $character->total_battles }}</p>
     </div>
 </body>
 </html>

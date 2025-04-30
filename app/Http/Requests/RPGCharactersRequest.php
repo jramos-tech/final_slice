@@ -22,6 +22,8 @@ class RPGCharactersRequest extends FormRequest
             'skills.*.name' => 'required|max:255',
             'skills.*.description' => 'required',
             'skills.*.power_level' => 'required|integer|min:1|max:100',
+            'battles_won' => 'required|integer|min:0',
+            'total_battles' => 'required|integer|min:0',
         ];
     }
 }
