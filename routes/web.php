@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\RPGCharacters;
+use App\Models\User;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -8,6 +9,54 @@ use Illuminate\Support\Facades\Log;
 Route::get('/', function () {
     return redirect()->route('characters.index');
 });
+
+Route::get('/login', function () {
+    return view('login');
+})->name('login');
+
+Route::post('/login', function (Request $request) {
+    $data = $request->validate([
+        'email' => 'required|max:255|email',
+        'password' => 'required'
+    ]);
+
+    $user = User::where('email', $data['email'])->first();
+
+    if ($user && password_verify($data['password'], $user->password)) {
+        session(['user_id' => $user->id, 'user_name' => $user->username]);
+
+        return redirect()->route('characters.index')
+            ->with('success', 'Login successful. Welcome back, ' . $user->username . '!');
+    } else {
+        return redirect()->route('login')
+            ->withErrors(['email' => 'Invalid email or password.']);
+    }
+})->name('login.go');
+
+Route::get('/register', function () {
+    return view('register');
+})->name('register');
+
+Route::post('/register', function (Request $request) {
+    $data = $request->validate([
+        'username' => 'required|max:50',
+        'email' => 'required|max:255|email',
+        'password' => 'required'
+    ]);
+
+    $user = User::where('username', $data['username'])->first();
+    if ($user) {
+        return redirect()->back()->withErrors(['username' => 'Username already taken']);
+    } else {
+        $user = new User;
+        $user->username = $data['username'];
+        $user->email = $data['email'];
+        $user->password = bcrypt($data['password']);
+        $user->save();
+    }
+    return redirect()->route('login')
+        ->with("success", 'User registered successfully. Please login to continue.');
+})->name('register.save');
 
 Route::get('/characters', function () {
     return view('index', [
