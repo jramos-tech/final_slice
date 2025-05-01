@@ -46,8 +46,11 @@ Route::post('/register', function (Request $request) {
     ]);
 
     $user = User::where('username', $data['username'])->first();
+    $email = User::where('email', $data['email'])->first();
     if ($user) {
         return redirect()->back()->withErrors(['username' => 'Username already taken']);
+    } elseif ($email) {
+        return redirect()->back()->withErrors(['email' => 'Email already taken']);
     } else {
         $user = new User;
         $user->username = $data['username'];
@@ -60,9 +63,7 @@ Route::post('/register', function (Request $request) {
 })->name('register.save');
 
 Route::get('/characters', function () {
-    return view('index', [
-        'characters' => RPGCharacters::with('user')->latest()->get()
-    ]);
+    return view('index');
 })->name('characters.index');
 
 Route::get('/create', function () {
@@ -147,6 +148,34 @@ Route::delete('/characters/{id}', function ($id) {
 
     return redirect()->route('account')->withErrors(['error' => 'Character not found or you do not have permission to delete it.']);
 })->name('characters.delete');
+
+Route::get('/api/characters', function (Request $request) {
+    $sortField = $request->query('sort', 'class_name'); // Default sort field
+    $sortOrder = $request->query('order', 'asc'); // Default sort order
+
+    // Validate the sort field and order
+    $validFields = ['class_name', 'battles_won', 'rarity', 'power_level'];
+    $validOrders = ['asc', 'desc'];
+
+    if (!in_array($sortField, $validFields) || !in_array($sortOrder, $validOrders)) {
+        return response()->json(['error' => 'Invalid sort field or order'], 400);
+    }
+
+    // Handle sorting by rarity with a custom order
+    if ($sortField === 'rarity') {
+        $rarityOrder = ['Common', 'Uncommon', 'Rare', 'Epic', 'Legendary'];
+        $characters = RPGCharacters::with('user')
+            ->orderByRaw("FIELD(rarity, '" . implode("','", $rarityOrder) . "') " . strtoupper($sortOrder))
+            ->get();
+    } else {
+        // Default sorting for other fields
+        $characters = RPGCharacters::with('user')
+            ->orderBy($sortField, $sortOrder)
+            ->get();
+    }
+
+    return response()->json($characters);
+})->name('api.characters');
 
 /*
 |--------------------------------------------------------------------------
