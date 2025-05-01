@@ -23,4 +23,9 @@ class RPGCharacters extends Model
         \Log::info('Skills for Character ' . $this->id . ': ' . $this->skills->pluck('power_level'));
         return $this->skills->sum('power_level');
     }
+  
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 }
