@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\RPGCharacters;
+use App\Models\User;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -9,9 +10,57 @@ Route::get('/', function () {
     return redirect()->route('characters.index');
 });
 
+Route::get('/login', function () {
+    return view('login');
+})->name('login');
+
+Route::post('/login', function (Request $request) {
+    $data = $request->validate([
+        'email' => 'required|max:255|email',
+        'password' => 'required'
+    ]);
+
+    $user = User::where('email', $data['email'])->first();
+
+    if ($user && password_verify($data['password'], $user->password)) {
+        session(['user_id' => $user->id, 'user_name' => $user->username]);
+
+        return redirect()->route('characters.index')
+            ->with('success', 'Login successful. Welcome back, ' . $user->username . '!');
+    } else {
+        return redirect()->route('login')
+            ->withErrors(['email' => 'Invalid email or password.']);
+    }
+})->name('login.go');
+
+Route::get('/register', function () {
+    return view('register');
+})->name('register');
+
+Route::post('/register', function (Request $request) {
+    $data = $request->validate([
+        'username' => 'required|max:50',
+        'email' => 'required|max:255|email',
+        'password' => 'required'
+    ]);
+
+    $user = User::where('username', $data['username'])->first();
+    if ($user) {
+        return redirect()->back()->withErrors(['username' => 'Username already taken']);
+    } else {
+        $user = new User;
+        $user->username = $data['username'];
+        $user->email = $data['email'];
+        $user->password = bcrypt($data['password']);
+        $user->save();
+    }
+    return redirect()->route('login')
+        ->with("success", 'User registered successfully. Please login to continue.');
+})->name('register.save');
+
 Route::get('/characters', function () {
     return view('index', [
-        'characters' => RPGCharacters::latest()->get()
+        'characters' => RPGCharacters::with('user')->latest()->get()
     ]);
 })->name('characters.index');
 
@@ -37,11 +86,17 @@ Route::post('/characters', function (Request $request) {
         'skills.*.power_level' => 'required|integer',
     ]);
 
+    $userId = session('user_id');
+    if (!$userId) {
+        return redirect()->route('login')->withErrors(['error' => 'You must be logged in to create a character.']);
+    }
+
     $character = new RPGCharacters;
     $character->class_name = $data['class_name'];
     $character->description = $data['description'];
     $character->abilities = $data['abilities'];
-    $character->rarity = $data['rarity']; 
+    $character->rarity = $data['rarity'];
+    $character->user_id = $userId;
     $character->save();
 
     foreach ($data['skills'] as $skillData) {
@@ -51,6 +106,39 @@ Route::post('/characters', function (Request $request) {
     return redirect()->route('characters.show', ['id' => $character->id])
         ->with("success", 'Character class created successfully');
 })->name('characters.store');
+
+Route::get('/account', function () {
+    $userId = session('user_id');
+    if (!$userId) {
+        return redirect()->route('login')->withErrors(['error' => 'You must be logged in to access this page.']);
+    }
+
+    $characters = RPGCharacters::where('user_id', $userId)->get();
+
+    return view('account', [
+        'characters' => $characters
+    ]);
+})->name('account');
+
+Route::post('/logout', function () {
+    session()->flush();
+    return redirect()->route('characters.index')->with('success', 'You have been logged out.');
+})->name('logout');
+
+Route::delete('/characters/{id}', function ($id) {
+    $userId = session('user_id');
+    if (!$userId) {
+        return redirect()->route('login')->withErrors(['error' => 'You must be logged in to delete a character.']);
+    }
+
+    $character = RPGCharacters::where('id', $id)->where('user_id', $userId)->first();
+    if ($character) {
+        $character->delete();
+        return redirect()->route('account')->with('success', 'Character deleted successfully.');
+    }
+
+    return redirect()->route('account')->withErrors(['error' => 'Character not found or you do not have permission to delete it.']);
+})->name('characters.delete');
 
 /*
 |--------------------------------------------------------------------------

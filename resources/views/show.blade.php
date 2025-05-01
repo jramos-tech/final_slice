@@ -16,6 +16,7 @@
         <p class="text-gray-700 mb-2"><strong>Description:</strong> {{ $character->description }}</p>
         <p class="text-gray-700 mb-2"><strong>Abilities:</strong> {{ $character->abilities }}</p>
         <p class="text-gray-700 mb-4"><strong>Rarity:</strong> {{ $character->rarity }}</p>
+        <p class="text-gray-700 mb-4"><strong>Created by:</strong> {{ $character->user->username ?? 'Unknown' }}</p>
 
         <h2 class="text-2xl font-semibold text-gray-800 mb-4">Special Skills</h2>
         <ul class="list-disc pl-6">
