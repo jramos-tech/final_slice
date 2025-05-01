@@ -12,9 +12,12 @@
     <h1 class="text-3xl font-bold mb-6 text-center text-gray-800">Character List</h1>
     <div class="flex justify-end mb-6">
         @if (session('user_id'))
-            <a href="{{ route('characters.create') }}" class="bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-600 shadow-md">
-                Create New Character
-            </a>
+          <a href="{{ route('characters.create') }}" class="bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-600 shadow-md">
+              Create New Character
+          </a>
+          <a href="{{ route('characters.battle') }}" class="bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-600 shadow-md">
+              Start a battle
+          </a>
         @endif
     </div>
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

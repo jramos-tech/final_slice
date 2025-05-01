@@ -18,6 +18,8 @@ class RPGCharactersFactory extends Factory
             'description' => $this->faker->paragraph,
             'abilities' => $this->faker->sentence,
             'rarity' => $this->faker->randomElement(['Common', 'Uncommon', 'Rare', 'Epic', 'Legendary']),
+            'battles_won' => $this->faker->numberBetween(0, 100),
+            'total_battles' => $this->faker->numberBetween(1, 100),
         ];
     }
 }
