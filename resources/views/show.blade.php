@@ -11,25 +11,37 @@
         <a href="{{ route('characters.index') }}" class="text-blue-500 hover:text-blue-700">← Back to characters</a>
     </div>
 
-    <div class="bg-white p-6 rounded shadow-md">
-        <h1 class="text-3xl font-bold text-gray-800 mb-4">{{ $character->class_name }}</h1>
-        <p class="text-gray-700 mb-2"><strong>Description:</strong> {{ $character->description }}</p>
-        <p class="text-gray-700 mb-2"><strong>Abilities:</strong> {{ $character->abilities }}</p>
-        <p class="text-gray-700 mb-4"><strong>Rarity:</strong> {{ $character->rarity }}</p>
-        <p class="text-gray-700 mb-4"><strong>Created by:</strong> {{ $character->user->username ?? 'Unknown' }}</p>
+    <div class="bg-white p-6 rounded shadow-md flex flex-col md:flex-row">
+        <!-- Text Section -->
+        <div class="md:w-2/3">
+            <h1 class="text-3xl font-bold text-gray-800 mb-4">{{ $character->class_name }}</h1>
+            <p class="text-gray-700 mb-2"><strong>Description:</strong> {{ $character->description }}</p>
+            <p class="text-gray-700 mb-2"><strong>Abilities:</strong> {{ $character->abilities }}</p>
+            <p class="text-gray-700 mb-4"><strong>Rarity:</strong> {{ $character->rarity }}</p>
+            <p class="text-gray-700 mb-4"><strong>Created by:</strong> {{ $character->user->username ?? 'Unknown' }}</p>
 
-        <h2 class="text-2xl font-semibold text-gray-800 mb-4">Special Skills</h2>
-        <ul class="list-disc pl-6">
-            @foreach ($character->skills as $skill)
-                <li class="mb-4">
-                    <strong class="text-gray-800">{{ $skill->name }}</strong> 
-                    <span class="text-sm text-gray-600">(Power Level: {{ $skill->power_level }})</span>
-                    <p class="text-gray-700">{{ $skill->description }}</p>
-                </li>
-            @endforeach
-        </ul>
-        <p class="text-gray-700 mb-4"><strong>Battles won:</strong> {{ $character->battles_won }}</p>
-        <p class="text-gray-700 mb-4"><strong>Total battles:</strong> {{ $character->total_battles }}</p>
+            <h2 class="text-2xl font-semibold text-gray-800 mb-4">Special Skills</h2>
+            <ul class="list-disc pl-6">
+                @foreach ($character->skills as $skill)
+                    <li class="mb-4">
+                        <strong class="text-gray-800">{{ $skill->name }}</strong> 
+                        <span class="text-sm text-gray-600">(Power Level: {{ $skill->power_level }})</span>
+                        <p class="text-gray-700">{{ $skill->description }}</p>
+                    </li>
+                @endforeach
+            </ul>
+            <p class="text-gray-700 mb-4"><strong>Battles won:</strong> {{ $character->battles_won }}</p>
+            <p class="text-gray-700 mb-4"><strong>Total battles:</strong> {{ $character->total_battles }}</p>
+        </div>
+
+        <!-- Image Section -->
+        <div class="md:w-1/3 md:ml-6 flex justify-center items-center">
+            @if ($character->image)
+                <img src="{{ $character->image }}" alt="{{ $character->class_name }}" class="rounded shadow-md w-full h-auto">
+            @else
+                <p class="text-gray-500 italic">No image available</p>
+            @endif
+        </div>
     </div>
 </body>
 </html>

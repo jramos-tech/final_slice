@@ -11,7 +11,7 @@ class RPGCharacters extends Model
 
     protected $table = 'r_p_g_characters';
 
-    protected $fillable = ['class_name', 'description', 'abilities', 'rarity', 'battles_won', 'total_battles'];
+    protected $fillable = ['class_name', 'description', 'abilities', 'image', 'rarity', 'battles_won', 'total_battles'];
 
     public function skills()
     {

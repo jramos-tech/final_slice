@@ -28,17 +28,28 @@
 
             characters.forEach(character => {
                 const characterCard = `
-                    <div class="bg-white p-4 rounded shadow-md hover:shadow-lg">
-                        <h2 class="text-xl font-semibold text-gray-700">${character.class_name} 
-                            <span class="text-sm text-gray-500">(${character.rarity})</span>
-                        </h2>
-                        <p class="text-gray-600 mt-2">${character.description}</p>
-                        <p class="text-gray-500 text-sm mt-2">
-                            Created by: <strong>${character.user?.username || 'Unknown'}</strong>
-                        </p>
-                        <a href="{{ route('characters.show', '') }}/${character.id}" class="text-blue-500 hover:underline mt-4 block">
-                            View Details
-                        </a>
+                    <div class="bg-white p-4 rounded shadow-md hover:shadow-lg flex flex-col md:flex-row">
+                        <!-- Image Section -->
+                        <div class="md:w-1/3 flex justify-center items-center mb-4 md:mb-0 md:mr-4">
+                            ${
+                                character.image
+                                    ? `<img src="${character.image}" alt="${character.class_name}" class="rounded shadow-md w-full h-auto">`
+                                    : `<p class="text-gray-500 italic">No image available</p>`
+                            }
+                        </div>
+                        <!-- Text Section -->
+                        <div class="md:w-2/3">
+                            <h2 class="text-xl font-semibold text-gray-700">${character.class_name} 
+                                <span class="text-sm text-gray-500">(${character.rarity})</span>
+                            </h2>
+                            <p class="text-gray-600 mt-2">${character.description}</p>
+                            <p class="text-gray-500 text-sm mt-2">
+                                Created by: <strong>${character.user?.username || 'Unknown'}</strong>
+                            </p>
+                            <a href="{{ route('characters.show', '') }}/${character.id}" class="text-blue-500 hover:underline mt-4 block">
+                                View Details
+                            </a>
+                        </div>
                     </div>
                 `;
                 characterGrid.innerHTML += characterCard;

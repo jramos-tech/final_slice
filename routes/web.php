@@ -85,6 +85,7 @@ Route::post('/characters', function (Request $request) {
         'description' => 'required',
         'abilities' => 'required',
         'rarity' => 'required|in:Common,Uncommon,Rare,Epic,Legendary',
+        'image' => 'nullable|url',
         'skills' => 'array',
         'skills.*.name' => 'required|max:255',
         'skills.*.description' => 'required',
@@ -100,6 +101,7 @@ Route::post('/characters', function (Request $request) {
     $character->class_name = $data['class_name'];
     $character->description = $data['description'];
     $character->abilities = $data['abilities'];
+    $character->image = $data['image'];
     $character->rarity = $data['rarity'];
     $character->battles_won = 0;
     $character->total_battles = 0;
@@ -149,11 +151,53 @@ Route::delete('/characters/{id}', function ($id) {
     return redirect()->route('account')->withErrors(['error' => 'Character not found or you do not have permission to delete it.']);
 })->name('characters.delete');
 
-Route::get('/api/characters', function (Request $request) {
-    $sortField = $request->query('sort', 'class_name'); // Default sort field
-    $sortOrder = $request->query('order', 'asc'); // Default sort order
+Route::get('/characters/{id}/edit', function ($id) {
+    $userId = session('user_id');
+    if (!$userId) {
+        return redirect()->route('login')->withErrors(['error' => 'You must be logged in to edit a character.']);
+    }
 
-    // Validate the sort field and order
+    $character = RPGCharacters::where('id', $id)->where('user_id', $userId)->first();
+    if (!$character) {
+        return redirect()->route('account')->withErrors(['error' => 'Character not found or you do not have permission to edit it.']);
+    }
+
+    return view('edit', [
+        'character' => $character
+    ]);
+})->name('characters.edit');
+
+Route::put('/characters/{id}', function (Request $request, $id) {
+    $data = $request->validate([
+        'class_name' => 'required|max:255',
+        'description' => 'required',
+        'abilities' => 'required',
+        'rarity' => 'required|in:Common,Uncommon,Rare,Epic,Legendary',
+        'image' => 'nullable|url',
+        'skills' => 'array',
+        'skills.*.name' => 'required|max:255',
+        'skills.*.description' => 'required',
+        'skills.*.power_level' => 'required|integer',
+    ]);
+
+    $character = RPGCharacters::findOrFail($id);
+    $character->update($data);
+
+    foreach ($data['skills'] as $skillData) {
+        $character->skills()->updateOrCreate(
+            ['id' => $skillData['id'] ?? null], 
+            $skillData
+        );
+    }
+
+    return redirect()->route('characters.show', $character->id)
+        ->with('success', 'Character updated successfully.');
+})->name('characters.update');
+
+Route::get('/api/characters', function (Request $request) {
+    $sortField = $request->query('sort', 'class_name');
+    $sortOrder = $request->query('order', 'asc'); 
+
     $validFields = ['class_name', 'battles_won', 'rarity', 'power_level'];
     $validOrders = ['asc', 'desc'];
 
@@ -161,14 +205,12 @@ Route::get('/api/characters', function (Request $request) {
         return response()->json(['error' => 'Invalid sort field or order'], 400);
     }
 
-    // Handle sorting by rarity with a custom order
     if ($sortField === 'rarity') {
         $rarityOrder = ['Common', 'Uncommon', 'Rare', 'Epic', 'Legendary'];
         $characters = RPGCharacters::with('user')
             ->orderByRaw("FIELD(rarity, '" . implode("','", $rarityOrder) . "') " . strtoupper($sortOrder))
             ->get();
     } else {
-        // Default sorting for other fields
         $characters = RPGCharacters::with('user')
             ->orderBy($sortField, $sortOrder)
             ->get();
@@ -176,71 +218,3 @@ Route::get('/api/characters', function (Request $request) {
 
     return response()->json($characters);
 })->name('api.characters');
-
-/*
-|--------------------------------------------------------------------------
-| Web Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register web routes for your application. These
-| routes are loaded by the RouteServiceProvider within a group which
-| contains the "web" middleware group. Now create something great!
-|
-*/
-
-// Route::get('/', function () {
-//     return view('welcome');
-// });
-
-// Route::get('/test', function(){
-//     return 'Hello';
-// })->name('hello');
-
-// Route::get("/hallo", function(){
-//     return redirect('/here', '/there');
-// });
-
-// Route::fallback(function () {
-// });
-
-// class Task{
-//     public function __construct(
-//         public int $id,
-//         public string $title,
-//         public string $description
-//         public string $long_description
-//     ){
-
-//     }
-// }
-// $tasks = [
-//     new Task(
-//         1,
-//         "Buy stuff",
-//         "Lots of stuff"
-//     ),
-//     new Task(
-//         2,
-//         "Rent stuff",
-//         "Rent lots of stuff"
-//     )
-// ];
-
-// Route::get('/', function () use ($tasks){
-//     return view('index', [
-//         'tasks' => $tasks
-//     ]);
-// })-name('tasks.index');
-
-// Rouet::get('/tasks', function(){
-//     return view('index', [
-//         'tasks' => \App\Models\Task::latest()->get()
-//     ]);
-// })-name('tasks.index');
-
-// ROute::get('/tasks/{id}', function($id){
-//     return view('show', [
-//         'task' => \App\Models\Task::findOrFail($id)
-//     ]);
-// })->name('tasks.show');
-

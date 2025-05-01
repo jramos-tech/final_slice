@@ -6,6 +6,24 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Add Character Class</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        function previewImage() {
+            const imageInput = document.getElementById('image');
+            const imagePreview = document.getElementById('image-preview');
+
+            imageInput.addEventListener('input', () => {
+                const imageUrl = imageInput.value;
+                if (imageUrl) {
+                    imagePreview.src = imageUrl;
+                    imagePreview.style.display = 'block';
+                } else {
+                    imagePreview.style.display = 'none';
+                }
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', previewImage);
+    </script>
 </head>
 
 <body class="container mx-auto mt-10 bg-gray-100 p-6">
@@ -45,6 +63,18 @@
             @error('rarity')
                 <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
             @enderror
+        </div>
+        <div class="mb-4 flex items-start">
+            <div class="w-2/3">
+                <label for="image" class="block text-gray-700 font-bold mb-2">Image Link</label>
+                <input type="url" name="image" id="image" class="w-full border border-gray-300 rounded px-3 py-2" placeholder="https://example.com/image.jpg" />
+                @error('image')
+                    <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                @enderror
+            </div>
+            <div class="w-1/3 ml-4">
+                <img id="image-preview" src="" alt="Image Preview" class="w-full h-auto rounded shadow-md" style="display: none;" />
+            </div>
         </div>
         <div id="skills" class="mb-4">
             <h3 class="text-xl font-bold text-gray-800 mb-4">Special Skills</h3>
