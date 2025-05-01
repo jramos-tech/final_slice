@@ -4,6 +4,7 @@ use App\Models\RPGCharacters;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use App\Http\Controllers\BattleController;
 
 Route::get('/', function () {
     return redirect()->route('characters.index');
@@ -19,9 +20,8 @@ Route::get('/create', function () {
     return view('create');
 })->name('characters.create');
 
-Route::get('/battle', function () {
-    return view('battle');
-})->name('characters.battle');
+Route::get('/battle', [BattleController::class, 'index'])->name('characters.battle');
+Route::post('/battle/fight', [BattleController::class, 'fight'])->name('characters.battle.fight');
 
 Route::get('/characters/{id}', function (RPGCharacters $id) {
     return view('show', [
@@ -39,8 +39,6 @@ Route::post('/characters', function (Request $request) {
         'skills.*.name' => 'required|max:255',
         'skills.*.description' => 'required',
         'skills.*.power_level' => 'required|integer',
-        'battles_won' => 'required|integer',
-        'total_battles' => 'required|integer',
     ]);
 
     $character = new RPGCharacters;
@@ -48,12 +46,14 @@ Route::post('/characters', function (Request $request) {
     $character->description = $data['description'];
     $character->abilities = $data['abilities'];
     $character->rarity = $data['rarity'];
-    $character->battles_won = $data['battles_won'];
-    $character->total_battles = $data['total_battles']; 
+    $character->battles_won = 0;
+    $character->total_battles = 0;
     $character->save();
 
-    foreach ($data['skills'] as $skillData) {
-        $character->skills()->create($skillData);
+    if (isset($data['skills'])) {
+        foreach ($data['skills'] as $skillData) {
+            $character->skills()->create($skillData);
+        }
     }
 
     return redirect()->route('characters.show', ['id' => $character->id])

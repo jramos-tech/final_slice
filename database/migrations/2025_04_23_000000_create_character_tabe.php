@@ -14,6 +14,8 @@ return new class extends Migration
             $table->text('description');
             $table->string('rarity');
             $table->text('abilities')->nullable();
+            $table->integer('battles_won')->default(0);
+            $table->integer('total_battles')->default(0);
             $table->timestamps();
         });
     }
