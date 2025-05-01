@@ -15,4 +15,9 @@ class RPGCharacters extends Model
     {
         return $this->hasMany(Skill::class, 'rpg_character_id'); 
     }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 }
