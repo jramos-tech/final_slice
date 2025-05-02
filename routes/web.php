@@ -195,8 +195,8 @@ Route::put('/characters/{id}', function (Request $request, $id) {
 })->name('characters.update');
 
 Route::get('/api/characters', function (Request $request) {
-    $sortField = $request->query('sort', 'class_name'); // Default sort field
-    $sortOrder = $request->query('order', 'asc'); // Default sort order
+    $sortField = $request->query('sort', 'class_name');
+    $sortOrder = $request->query('order', 'asc');
 
     $validFields = ['class_name', 'battles_won', 'rarity', 'power_level'];
     $validOrders = ['asc', 'desc'];
@@ -206,13 +206,11 @@ Route::get('/api/characters', function (Request $request) {
     }
 
     if ($sortField === 'rarity') {
-        // Custom sorting for rarity
         $rarityOrder = ['Common', 'Uncommon', 'Rare', 'Epic', 'Legendary'];
         $characters = RPGCharacters::with('user')
             ->orderByRaw("FIELD(rarity, '" . implode("','", $rarityOrder) . "') " . strtoupper($sortOrder))
             ->get();
     } elseif ($sortField === 'power_level') {
-        // Sorting by power_level (calculated from the skills table)
         $characters = RPGCharacters::with('user')
             ->leftJoin('skills', 'r_p_g_characters.id', '=', 'skills.rpg_character_id') // Correct table name
             ->select('r_p_g_characters.*', \DB::raw('SUM(skills.power_level) as total_power_level'))
@@ -220,7 +218,6 @@ Route::get('/api/characters', function (Request $request) {
             ->orderBy('total_power_level', $sortOrder)
             ->get();
     } else {
-        // Default sorting for other fields
         $characters = RPGCharacters::with('user')
             ->orderBy($sortField, $sortOrder)
             ->get();

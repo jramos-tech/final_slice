@@ -32,7 +32,7 @@
         document.addEventListener('DOMContentLoaded', previewImage);
     </script>
 </head>
-
+@include('sections.header')
 <body class="container mx-auto mt-10 bg-gray-100 p-6">
     <h1 class="text-3xl font-bold mb-6 text-center text-gray-800">Edit {{ $character->class_name }}</h1>
     <form method="POST" action="{{ route('characters.update', $character->id) }}" class="bg-white p-6 rounded shadow-md max-w-lg mx-auto">
@@ -102,5 +102,6 @@
         <button type="submit" class="w-full bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Complete Edit</button>
     </form>
 </body>
+@include('sections.footer')
 
 </html>

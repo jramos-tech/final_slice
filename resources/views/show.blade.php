@@ -6,13 +6,13 @@
     <title>Character Details</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
+@include('sections.header')
 <body class="container mx-auto mt-10 bg-gray-100 p-6">
     <div class="mb-4">
         <a href="{{ route('characters.index') }}" class="text-blue-500 hover:text-blue-700">← Back to characters</a>
     </div>
 
     <div class="bg-white p-6 rounded shadow-md flex flex-col md:flex-row">
-        <!-- Text Section -->
         <div class="md:w-2/3">
             <h1 class="text-3xl font-bold text-gray-800 mb-4">{{ $character->class_name }}</h1>
             <p class="text-gray-700 mb-2"><strong>Description:</strong> {{ $character->description }}</p>
@@ -34,7 +34,6 @@
             <p class="text-gray-700 mb-4"><strong>Total battles:</strong> {{ $character->total_battles }}</p>
         </div>
 
-        <!-- Image Section -->
         <div class="md:w-1/3 md:ml-6 flex justify-center items-center">
             @if ($character->image)
                 <img src="{{ $character->image }}" alt="{{ $character->class_name }}" class="rounded shadow-md w-full h-auto">
@@ -44,4 +43,5 @@
         </div>
     </div>
 </body>
+@include('sections.footer')
 </html>

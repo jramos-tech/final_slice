@@ -7,7 +7,7 @@
     <title>RPG Battle Arena</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-
+@include('sections.header')
 <body class="container mx-auto mt-10 bg-gray-100 p-6">
     <h1 class="text-3xl font-bold mb-6 text-center text-gray-800">Battle Arena</h1>
     <div class="flex justify-end mb-6">
@@ -89,5 +89,6 @@
         </div>
     @endif
 </body>
+@include('sections.footer')
 
 </html>

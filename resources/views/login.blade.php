@@ -9,7 +9,7 @@
 </head>
 @include('sections.header')
 <body class="container mx-auto mt-10 bg-gray-100 p-6">
-    <div class="flex justify-center items-center h-screen">
+    <div class="flex justify-center items-center min-h-[70vh]">
         <div class="w-full max-w-md bg-white p-8 rounded shadow-md">
             <h2 class="text-2xl font-bold text-center text-gray-800 mb-6">Login</h2>
             <form action="{{ route('login') }}" method="POST">
